@@ -7,6 +7,7 @@ import { fetchFromApi } from "@/api/core";
 import MovieCard from "@/components/Card";
 import { Category, Movie } from "@/type";
 import Loader from "@/components/Loader";
+import { getFavoriteMovies } from "@/utils/functions";
 
 
 
@@ -130,7 +131,8 @@ const HomePage = () => {
               key={movie.id}
               id={movie.id}
               title={movie.title}
-              posterPath={movie.poster_path}
+              poster_path={movie.poster_path}
+              release_date={movie.release_date}
             />
           ))}
         </div>
@@ -146,6 +148,15 @@ const HomePage = () => {
       {/* Categories Section */}
       {!loading && categories.length > 0 && !debouncedQuery && (
         <div>
+          {
+            getFavoriteMovies()?.length !== 0 &&
+            <CategoryRow
+              id={1}
+              name={"My Favourites"}
+              movies={getFavoriteMovies()}
+            />
+          }
+          
           {categories.map((category) => (
             <CategoryRow
               key={category.id}

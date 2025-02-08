@@ -105,7 +105,8 @@ const SearchPage = ({ params }: { params: Promise<{ query: string }> }) => {
                 <MovieCard
                   id={movie.id}
                   title={movie.title}
-                  posterPath={movie.poster_path}
+                  poster_path={movie.poster_path}
+                  release_date={movie.release_date}
                 />
               </div>
             );
@@ -115,7 +116,8 @@ const SearchPage = ({ params }: { params: Promise<{ query: string }> }) => {
                 key={movie.id}
                 id={movie.id}
                 title={movie.title}
-                posterPath={movie.poster_path}
+                poster_path={movie.poster_path}
+                release_date={movie.release_date}
               />
             );
           }

@@ -3,12 +3,9 @@
 import React from "react";
 import Link from "next/link";
 import MovieCard from "./Card";
+import { Movie } from "@/type";
 
-interface Movie {
-  id: number;
-  title: string;
-  poster_path: string | null;
-}
+
 
 interface CategoryRowProps {
   id: number;
@@ -17,6 +14,7 @@ interface CategoryRowProps {
 }
 
 const CategoryRow: React.FC<CategoryRowProps> = ({ id, name, movies }) => {
+  
   return (
     <div className="mb-10">
       {/* Category Header */}
@@ -42,7 +40,8 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ id, name, movies }) => {
             key={movie.id}
             id={movie.id}
             title={movie.title}
-            posterPath={movie.poster_path}
+            poster_path={movie.poster_path}
+            release_date={movie.release_date}
           />
         ))}
       </div>

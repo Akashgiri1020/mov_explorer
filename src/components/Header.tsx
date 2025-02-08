@@ -15,16 +15,16 @@ const Header = () => {
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <div className="flex items-center space-x-2 text-xl font-bold text-primary">
+          <Link href={'/'} className="flex items-center space-x-2 text-xl font-bold text-primary">
             <Film className="w-6 h-6" />
             <span>Movie Explorer</span>
-          </div>
+          </Link>
 
           {/* Navigation  Menu */}
           <nav className="flex space-x-6">
             
             <Link 
-              href="#about" 
+              href="/favourites" 
               className="flex items-center space-x-2 text-tertiary hover:text-accent transition-colors duration-200"
             >
               <Heart className="w-4 h-4" />
