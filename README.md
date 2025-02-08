@@ -92,7 +92,7 @@ This will generate a `/.next` folder containing the compiled files.
 To start the production server, run:
 
 ```bash
-npm run dev
+npm start
 
 ```
 
