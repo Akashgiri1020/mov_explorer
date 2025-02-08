@@ -6,6 +6,7 @@ import CategoryRow from "@/components/CategoryRow";
 import { fetchFromApi } from "@/api/core";
 import MovieCard from "@/components/Card";
 import { Category, Movie } from "@/type";
+import Loader from "@/components/Loader";
 
 
 
@@ -85,11 +86,17 @@ const HomePage = () => {
     }
   };
 
+  if(loading){
+    return(
+      <Loader/>
+    )
+  }
+
   return (
-    <div className="p-4">
+    <div className="p-4 bg-secondary">
       {/* Page Title */}
       <h1 className="text-3xl font-bold text-center mb-6 text-primary">
-        Movie Explorer
+        Search Your Movie Here...
       </h1>
 
       {/* Search Bar */}
@@ -105,7 +112,7 @@ const HomePage = () => {
           href={`/search/${encodeURIComponent(
             query.trim().replace(" ", "+")
           )}`}
-          className="bg-primary text-white hover:bg-accent px-4 py-2 rounded-lg"
+          className="bg-primary text-white hover:bg-accent max-sm:text-center px-4 py-2 rounded-lg"
         >
           Search
         </Link>

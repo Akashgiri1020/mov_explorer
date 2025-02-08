@@ -14,6 +14,7 @@ import {
   AlertTriangle,
   Link,
 } from "lucide-react";
+import Loader from "@/components/Loader";
 
 interface MovieDetail {
   id: number;
@@ -50,8 +51,8 @@ const MovieDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
         setMovie(res);
       } catch (error) {
         console.error(error);
-      }finally{
-        setLoading(false)
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -60,15 +61,13 @@ const MovieDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-secondary">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-      </div>
+      <Loader/>
     );
   }
 
   if (!movie) {
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-secondary">
+      <div className="flex flex-col items-center justify-center min-h-screen bg-secondary">
         <AlertTriangle className="text-primary h-12 w-12 mb-4" />
         <p className="text-primary text-lg font-semibold mb-2">Page not found.</p>
         <Link
@@ -84,7 +83,7 @@ const MovieDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
   return (
     <div className="min-h-screen bg-secondary">
       {/* Hero Section with Backdrop */}
-      <div className="relative h-96">
+      <div className="relative h-64 sm:h-96">
         {movie.backdrop_path ? (
           <div className="absolute inset-0">
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-secondary"></div>
@@ -102,17 +101,17 @@ const MovieDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
       </div>
 
       {/* Content Section */}
-      <div className="relative max-w-6xl mx-auto px-4 -mt-32">
-        <div className="bg-secondary rounded-lg shadow-xl p-6 md:p-8 border border-tertiary">
-          <div className="flex flex-col md:flex-row gap-8">
+      <div className="relative max-w-6xl mx-auto px-4 -mt-24 sm:-mt-32">
+        <div className="bg-secondary rounded-lg shadow-xl p-4 sm:p-6 md:p-8 border border-tertiary">
+          <div className="flex flex-col md:flex-row gap-6">
             {/* Poster */}
             {movie.poster_path && (
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 mx-auto md:mx-0">
                 <Image
                   src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                   alt={movie.title}
-                  width={300}
-                  height={450}
+                  width={250}
+                  height={375}
                   className="rounded-lg shadow-lg"
                   priority
                 />
@@ -121,30 +120,42 @@ const MovieDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
             {/* Movie Details */}
             <div className="flex-grow">
-              <h1 className="text-4xl font-bold text-primary mb-2">{movie.title}</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-2">
+                {movie.title}
+              </h1>
               {movie.tagline && (
-                <p className="text-xl text-accent italic mb-6">{movie.tagline}</p>
+                <p className="text-lg sm:text-xl text-accent italic mb-4">
+                  {movie.tagline}
+                </p>
               )}
 
               {/* Key Info */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 mb-6">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-5 h-5 text-primary" />
-                  <span className="text-tertiary">{formatDate(movie.release_date)}</span>
+                  <span className="text-tertiary text-sm sm:text-base">
+                    {formatDate(movie.release_date)}
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-accent" />
-                  <span className="text-tertiary">{movie.vote_average.toFixed(1)}/10</span>
+                  <span className="text-tertiary text-sm sm:text-base">
+                    {movie.vote_average.toFixed(1)}/10
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5 text-primary" />
-                  <span className="text-tertiary">{movie.runtime} min</span>
+                  <span className="text-tertiary text-sm sm:text-base">
+                    {movie.runtime} min
+                  </span>
                 </div>
                 {movie.spoken_languages && (
                   <div className="flex items-center gap-2">
                     <Globe className="w-5 h-5 text-accent" />
-                    <span className="text-tertiary">
-                      {movie.spoken_languages.map(lang => lang.english_name).join(", ")}
+                    <span className="text-tertiary text-sm sm:text-base">
+                      {movie.spoken_languages
+                        .map((lang) => lang.english_name)
+                        .join(", ")}
                     </span>
                   </div>
                 )}
@@ -155,7 +166,7 @@ const MovieDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
                 {movie.genres.map((genre) => (
                   <span
                     key={genre.id}
-                    className="bg-primary text-secondary px-3 py-1 rounded-full text-sm font-medium"
+                    className="bg-primary text-secondary px-3 py-1 rounded-full text-xs sm:text-sm font-medium"
                   >
                     {genre.name}
                   </span>
@@ -164,19 +175,25 @@ const MovieDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
 
               {/* Overview */}
               <div className="mb-8">
-                <h2 className="text-2xl font-semibold text-primary mb-4">Overview</h2>
-                <p className="text-tertiary leading-relaxed">{movie.overview}</p>
+                <h2 className="text-xl sm:text-2xl font-semibold text-primary mb-4">
+                  Overview
+                </h2>
+                <p className="text-tertiary leading-relaxed text-sm sm:text-base">
+                  {movie.overview}
+                </p>
               </div>
 
               {/* Financial Info */}
               {(movie.budget || movie.revenue) && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 mb-8">
                   {movie.budget && (
                     <div className="flex items-center gap-3 border border-tertiary p-4 rounded-lg">
                       <DollarSign className="w-6 h-6 text-accent" />
                       <div>
                         <p className="text-sm text-tertiary">Budget</p>
-                        <p className="text-lg font-semibold text-primary">${movie.budget.toLocaleString()}</p>
+                        <p className="text-lg font-semibold text-primary">
+                          ${movie.budget.toLocaleString()}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -185,7 +202,9 @@ const MovieDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
                       <DollarSign className="w-6 h-6 text-accent" />
                       <div>
                         <p className="text-sm text-tertiary">Revenue</p>
-                        <p className="text-lg font-semibold text-primary">${movie.revenue.toLocaleString()}</p>
+                        <p className="text-lg font-semibold text-primary">
+                          ${movie.revenue.toLocaleString()}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -193,32 +212,38 @@ const MovieDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
               )}
 
               {/* Production Companies */}
-              {movie.production_companies && movie.production_companies.length > 0 && (
-                <div>
-                  <h2 className="text-2xl font-semibold text-primary mb-4 flex items-center gap-2">
-                    <Building2 className="w-6 h-6 text-accent" />
-                    Production Companies
-                  </h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {movie.production_companies.map((company) => (
-                      <div key={company.id} className="flex items-center gap-3 border border-tertiary p-4 rounded-lg">
-                        {company.logo_path ? (
-                          <Image
-                            src={`https://image.tmdb.org/t/p/w200${company.logo_path}`}
-                            alt={company.name}
-                            width={50}
-                            height={50}
-                            className="object-contain"
-                          />
-                        ) : (
-                          <Building2 className="w-8 h-8 text-tertiary" />
-                        )}
-                        <span className="text-tertiary font-medium">{company.name}</span>
-                      </div>
-                    ))}
+              {movie.production_companies &&
+                movie.production_companies.length > 0 && (
+                  <div>
+                    <h2 className="text-xl sm:text-2xl font-semibold text-primary mb-4 flex items-center gap-2">
+                      <Building2 className="w-6 h-6 text-accent" />
+                      Production Companies
+                    </h2>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3">
+                      {movie.production_companies.map((company) => (
+                        <div
+                          key={company.id}
+                          className="flex items-center gap-3 border border-tertiary p-4 rounded-lg"
+                        >
+                          {company.logo_path ? (
+                            <Image
+                              src={`https://image.tmdb.org/t/p/w200${company.logo_path}`}
+                              alt={company.name}
+                              width={40}
+                              height={40}
+                              className="object-contain"
+                            />
+                          ) : (
+                            <Building2 className="w-8 h-8 text-tertiary" />
+                          )}
+                          <span className="text-tertiary font-medium">
+                            {company.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {/* Homepage Link */}
               {movie.homepage && (

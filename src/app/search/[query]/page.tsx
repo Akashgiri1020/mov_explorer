@@ -6,20 +6,21 @@ import { fetchFromApi } from "@/api/core";
 import MovieCard from "@/components/Card";
 import { Movie } from "@/type";
 import Link from "next/link";
+import Loader from "@/components/Loader";
 
 const SearchPage = ({ params }: { params: Promise<{ query: string }> }) => {
-
   const [searchResults, setSearchResults] = useState<Movie[]>([]);
   const [localQuery, setQuery] = useState("");
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // For initial loading
+  const [pageLoading, setPageLoading] = useState(false); // For infinite scroll loading
   const [error, setError] = useState("");
   const [hasMore, setHasMore] = useState(true);
 
   const observer = useRef<IntersectionObserver | null>(null);
   const lastMovieRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (loading) return;
+      if (pageLoading) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasMore) {
@@ -28,35 +29,46 @@ const SearchPage = ({ params }: { params: Promise<{ query: string }> }) => {
       });
       if (node) observer.current.observe(node);
     },
-    [loading, hasMore]
+    [pageLoading, hasMore]
   );
 
-  useEffect(() => {
-    const fetchResults = async () => {
+  const fetchResults = async (isInitialLoad = false) => {
+    try {
+      if (isInitialLoad) setLoading(true);
+      else setPageLoading(true);
+
       const query = (await params).query;
-      try {
-        setLoading(true);
-        setError("");
+      setError("");
 
-        const { results, total_pages } = await fetchFromApi("/search/movie", {
-          query,
-          page,
-        });
+      const { results, total_pages } = await fetchFromApi("/search/movie", {
+        query,
+        page,
+      });
 
-        setSearchResults((prevResults) =>
-          page === 1 ? results : [...prevResults, ...results]
-        );
-        setQuery(query);
-        setHasMore(page < total_pages);
-      } catch (err: any) {
-        setError(err.message || "Something went wrong.");
-      } finally {
-        setLoading(false);
-      }
-    };
+      setSearchResults((prevResults) =>
+        isInitialLoad ? results : [...prevResults, ...results]
+      );
+      setQuery(query);
+      setHasMore(page < total_pages);
+    } catch (err: any) {
+      setError(err.message || "Something went wrong.");
+    } finally {
+      if (isInitialLoad) setLoading(false);
+      else setPageLoading(false);
+    }
+  };
 
-    fetchResults();
+  useEffect(() => {
+    fetchResults(true); // Initial load
+  }, []);
+
+  useEffect(() => {
+    if (page > 1) fetchResults(false); // Load more data for infinite scroll
   }, [page]);
+
+  if (loading) {
+    return <Loader />;
+  }
 
   return (
     <div className="p-4">
@@ -110,8 +122,8 @@ const SearchPage = ({ params }: { params: Promise<{ query: string }> }) => {
         })}
       </div>
 
-      {/* Loading Indicator */}
-      {loading && <p className="text-center text-accent mt-6">Loading...</p>}
+      {/* Page Loading Indicator */}
+      {pageLoading && <p className="text-center text-accent mt-6">Loading more movies...</p>}
 
       {/* No Results Found */}
       {!loading && searchResults.length === 0 && (

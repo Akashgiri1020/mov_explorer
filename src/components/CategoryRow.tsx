@@ -24,12 +24,12 @@ const CategoryRow: React.FC<CategoryRowProps> = ({ id, name, movies }) => {
         {/* Category Title */}
         <h2 className="text-xl font-bold text-white">{name}</h2>
         {/* Link to View All Movies in Category */}
-        <Link
+        {/* <Link
           href={`/category/${id}`}
           className="text-primary hover:text-accent text-sm font-medium"
         >
           View All
-        </Link>
+        </Link> */}
       </div>
 
       {/* Horizontal Scrollable Row for Movies */}
