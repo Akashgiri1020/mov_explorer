@@ -115,7 +115,7 @@ const HomePage = () => {
       {loading && <p className="text-center text-accent">Loading...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
 
-      {!loading && debouncedQuery && searchResult?.length > 0 && (
+      {!loading && debouncedQuery && searchResult && searchResult?.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {searchResult?.map((movie) => (
             <MovieCard
