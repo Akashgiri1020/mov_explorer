@@ -9,12 +9,11 @@ import { Category, Movie } from "@/type";
 import Loader from "@/components/Loader";
 import { getFavoriteMovies } from "@/utils/functions";
 
-
-
 const HomePage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchResult, setSearchResult] = useState<Movie[]>();
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -37,7 +36,7 @@ const HomePage = () => {
     if (debouncedQuery) {
       searchQuery(debouncedQuery);
     } else {
-      fetchCategories();
+      fetchCategories(false); // Only update categories without full-screen loading
     }
   }, [debouncedQuery]);
 
@@ -47,7 +46,7 @@ const HomePage = () => {
       setLoading(true);
       setError("");
 
-      const { results } = await fetchFromApi("/search/movie", { query: query });
+      const { results } = await fetchFromApi("/search/movie", { query });
       setSearchResult(results);
     } catch (err: any) {
       setError(err.message || "Something went wrong.");
@@ -57,15 +56,14 @@ const HomePage = () => {
   };
 
   // Function to fetch categories and associated movies
-  const fetchCategories = async () => {
+  const fetchCategories = async (isInitial = true) => {
     try {
+      if (isInitial) setInitialLoading(true);
       setLoading(true);
       setError("");
 
-      // Fetch categories
       const { genres } = await fetchFromApi("/genre/movie/list");
 
-      // Fetch movies for each category
       const categoryData: Category[] = await Promise.all(
         genres.map(async (genre: { id: number; name: string }) => {
           const { results: movies } = await fetchFromApi("/discover/movie", {
@@ -74,7 +72,7 @@ const HomePage = () => {
           return {
             id: genre.id,
             name: genre.name,
-            movies: movies.slice(0, 10), // Limit to top 10 movies
+            movies: movies.slice(0, 10),
           };
         })
       );
@@ -84,23 +82,20 @@ const HomePage = () => {
       setError(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
+      if (isInitial) setInitialLoading(false);
     }
   };
 
-  if(loading){
-    return(
-      <Loader/>
-    )
+  if (initialLoading) {
+    return <Loader />;
   }
 
   return (
     <div className="p-4 bg-secondary">
-      {/* Page Title */}
       <h1 className="text-3xl font-bold text-center mb-6 text-primary">
         Search Your Movie Here...
       </h1>
 
-      {/* Search Bar */}
       <div className="flex flex-col sm:flex-row justify-center mb-8 gap-4">
         <input
           type="text"
@@ -110,21 +105,17 @@ const HomePage = () => {
           onChange={(e) => setQuery(e.target.value)}
         />
         <Link
-          href={`/search/${encodeURIComponent(
-            query.trim().replace(" ", "+")
-          )}`}
+          href={`/search/${encodeURIComponent(query.trim().replace(" ", "+"))}`}
           className="bg-primary text-white hover:bg-accent max-sm:text-center px-4 py-2 rounded-lg"
         >
           Search
         </Link>
       </div>
 
-      {/* Loading and Error States */}
       {loading && <p className="text-center text-accent">Loading...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
 
-      {/* Search Results */}
-      {!loading && debouncedQuery && searchResult?.length && (
+      {!loading && debouncedQuery && searchResult?.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {searchResult?.map((movie) => (
             <MovieCard
@@ -138,25 +129,21 @@ const HomePage = () => {
         </div>
       )}
 
-      {/* No Results Found */}
       {!loading && debouncedQuery && searchResult?.length === 0 && (
         <p className="text-center text-gray-500 mt-10">
           No movies found for "{debouncedQuery}".
         </p>
       )}
 
-      {/* Categories Section */}
       {!loading && categories.length > 0 && !debouncedQuery && (
         <div>
-          {
-            getFavoriteMovies()?.length !== 0 &&
+          {getFavoriteMovies()?.length !== 0 && (
             <CategoryRow
               id={1}
               name={"My Favourites"}
               movies={getFavoriteMovies()}
             />
-          }
-          
+          )}
           {categories.map((category) => (
             <CategoryRow
               key={category.id}

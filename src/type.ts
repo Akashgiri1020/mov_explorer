@@ -3,6 +3,7 @@ export interface Movie {
   title: string;
   poster_path: string | null;
   release_date: string;
+  isFavourite?:boolean;
 }
 
 export interface Category {

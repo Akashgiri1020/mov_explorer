@@ -18,7 +18,6 @@ export const fetchFromApi = async (endpoint: string, params: Record<string, any>
   
 
   try {
-    toast.info("Fetching data..."); // Show loading toast
     const response = await fetch(url.toString());
     if (!response.ok) {
       throw new Error(`Error: ${response.status} ${response.statusText}`);
