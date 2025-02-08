@@ -4,7 +4,16 @@ import { fetchFromApi } from "@/api/core";
 import { formatDate } from "@/utils/functions";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { Star, Clock, Calendar, Globe, Building2, DollarSign } from "lucide-react";
+import {
+  Star,
+  Clock,
+  Calendar,
+  Globe,
+  Building2,
+  DollarSign,
+  AlertTriangle,
+  Link,
+} from "lucide-react";
 
 interface MovieDetail {
   id: number;
@@ -19,27 +28,55 @@ interface MovieDetail {
   tagline?: string;
   budget?: number;
   revenue?: number;
-  production_companies?: { id: number; name: string; logo_path: string | null }[];
+  production_companies?: {
+    id: number;
+    name: string;
+    logo_path: string | null;
+  }[];
   homepage?: string;
   spoken_languages?: { english_name: string }[];
 }
 
-const MovieDetailPage = ({ params }: { params: { id: string } }) => {
+const MovieDetailPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const [movie, setMovie] = useState<MovieDetail | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
-      const res = await fetchFromApi(`/movie/${params.id}`);
-      setMovie(res);
+      try {
+        setLoading(true);
+        const slug = (await params).id;
+        const res = await fetchFromApi(`/movie/${slug}`);
+        setMovie(res);
+      } catch (error) {
+        console.error(error);
+      }finally{
+        setLoading(false)
+      }
     };
 
     fetchMovieDetails();
-  }, [params.id]);
+  }, []);
 
-  if (!movie) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-secondary">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!movie) {
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-secondary">
+        <AlertTriangle className="text-primary h-12 w-12 mb-4" />
+        <p className="text-primary text-lg font-semibold mb-2">Page not found.</p>
+        <Link
+          href="/"
+          className="text-sm font-medium text-secondary bg-primary px-4 py-2 rounded hover:bg-primary-dark transition-colors"
+        >
+          Go to Homepage
+        </Link>
       </div>
     );
   }
